@@ -1,0 +1,165 @@
+# Name of the program : Tic Tac Toe
+#Author : Danny Jung
+
+# Methods goes from here 
+
+# Makeing an hash. Each key has one number from 1 to 9 with the value of " "
+def initialize_board
+	l = {}
+	(1..9).each {|position| l[position] = ' '}
+	l
+end
+
+# Drawing board. With the parameter in this method, when draw board, it shows which position is empty or filled.
+def draw_board(l)
+	system('clear')
+	puts " *** Welcome to Danny's Tic Tac Toe game *** "
+	puts
+	puts "  #{l[1]}  |  #{l[2]}  |  #{l[3]}"
+	puts "  -------------"
+	puts "  #{l[4]}  |  #{l[5]}  |  #{l[6]}"
+	puts "  -------------"
+	puts "  #{l[7]}  |  #{l[8]}  |  #{l[9]}"
+end
+
+# When user play, this method check whether the position the user choose is availale and it is is, mark it with "O".
+def check_user_positions(l, user_position)
+	if l.select {|k, v| v != ' '}.keys.include?(user_position)
+		puts "Sorry, but this position was already taken, Please choose again (0 - 9) >"
+		user_position = gets.chomp.to_i
+		check_user_positions(l, user_position)
+	elsif user_position == 0 
+		puts "Umm, didn't get that. Please choose again (0 - 9) >"
+		user_position = gets.chomp.to_i
+		check_user_positions(l, user_position) 
+	else
+		l[user_position] = 'X'
+	end
+end
+
+# Chechking empty position. 
+def empty_positions(l)
+	l.select {|k, v| v == ' '}.keys
+end
+
+# Deciding the level of difficulty. This method is connected to computer_picks and passes different variables over, depending on what the user choice is.
+def check_difficulty
+	print "\nPlease choose a level bewtween 1(easy) and 2(difficult) (1 or 2) > "
+	user_input = gets.chomp.to_i
+	if user_input == 1 || user_input == 2
+		return user_input
+	elsif user_input == 0
+		print "Sorry didn't get that\n"
+		check_difficulty
+	else
+		print "Umm.. Sorry didn't get that\n"
+		check_difficulty
+	end
+end
+
+# Getting user position choice and pass over it to check_user_position to see whether the position is available. 
+def player_picks(l)
+	
+	puts "\n[You] are \"X\"s and the [computer] is \"O\"s"
+	puts "\nPlease choose a position on the board (1 - 9) >"
+	user_position = gets.chomp.to_i
+	position_check = check_user_positions(l, user_position)
+end
+
+# With the input from check_difficulty, this method substitutes different values for the level change. 
+# For defence, it picks the last number of the winning line from the winning_lines when the user already filled two positions from any of winnin_lines (meaning, the user is about to win).
+# This method works with the combination of the defence and random pick to adjust the level of difficulty. 
+def computer_picks(l, difficulty)
+	
+if difficulty == 1
+	a = 4
+	b = 2
+else 
+	a = 2
+	b = 4
+end
+
+winning_lines = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]]
+
+if empty_positions(l).count == 8 || empty_positions(l).count == a
+	computer_position = empty_positions(l).sample
+	l[computer_position] = 'O'
+elsif empty_positions(l).count == 6 || empty_positions(l).count == b
+		winning_lines.each do |line|
+		if l.values_at(*line).count('X') == 2 
+			if l.values_at(*line).count('O') == 0
+	 		computer = line.select {|x| l[x] == ' '}.join.to_i
+	 			l[computer] = 'O' 
+					break
+				end
+		  	end
+		end
+		
+end 
+end
+
+# Checking out whether there is a winner. If these is, it returns the name of the winner. 
+def winner_check(l)
+	winning_lines = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], [3,5,7]]
+	winning_lines.each do |line|
+		return "Player" if l.values_at(*line).count('X') == 3
+		return "Computer" if l.values_at(*line).count('O') == 3
+	end 
+	false
+end
+
+# Depends on the user choice (Y or N), this decides whether continueing the loop or stop the program. 
+def replay(arg)
+	if arg == 'y' || arg == "yes"
+		puts "---------Time for a rematch!---------"
+	elsif arg == 'n' || arg == "no"
+		puts "\n---------Thanks for enjoing with us!---------\n"
+		exit
+	elsif arg == 0
+		print "Sorry, pleae choose again (Y or N) >"
+		play_again_choice = gets.chomp
+		replay(play_again_choice)
+	else
+		print "\nOops, didn't catch that, Would you like to play again? (Y or N) >"
+		arg = gets.chomp
+		replay(arg)
+	end
+end
+	
+# Methods end here 	
+
+
+
+# Main Application starts from here 
+
+
+loop  do 
+
+board = initialize_board
+draw_board(board)
+difficulty = check_difficulty
+draw_board(board)
+
+begin 
+
+player_picks(board)
+computer_picks(board, difficulty)
+draw_board(board)
+winner = winner_check(board)
+end until winner || empty_positions(board).empty?
+
+if winner == "Player"
+	puts "\nYou are the winner!!!"
+elsif winner == "Computer"
+	puts "\nYou played very well, but you need to grow up!"
+else 
+	puts "\nIt's a Tie! but You did really good job!!"
+end
+
+print "\nWould you like to play another round of Tic Tac Toe ?  (Y or N) >"
+play_again_choice = gets.chomp
+replay(play_again_choice)
+
+end
+
+# Main Application ends here 
