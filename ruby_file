@@ -22,7 +22,7 @@ def draw_board(l)
 	puts "  #{l[7]}  |  #{l[8]}  |  #{l[9]}"
 end
 
-# When user play, this method check whether the position the user choose is availale and it is is, mark it with "O".
+# When user play, this method check whether the position the user choose is availale and it if is, mark it with "O".
 def check_user_positions(l, user_position)
 	if l.select {|k, v| v != ' '}.keys.include?(user_position)
 		puts "Sorry, but this position was already taken, Please choose again (0 - 9) >"
